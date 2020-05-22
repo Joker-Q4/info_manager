@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manager.mapper.EntrepreneurMapper">
+	<resultMap id="entrepreneur" type="Entrepreneur">
+		<id property="account" column="account" javaType="int"/>
+		<result property="name" column="name" javaType="String"/>
+		<result property="password" column="password" javaType="String"/>
+		<result property="sex" column="sex" javaType="String"/>
+		<result property="phoneNumber" column="phone_number" javaType="String"/>
+		<result property="address" column="address" javaType="String"/>
+		<result property="resume" column="resume" javaType="String"/>
+		<result property="currentState" column="current_state" javaType="int"/>
+		<result property="teacherAccount" column="teacher_account" javaType="int"/>
+		<association property="teacher" column="teacher_account" javaType="Teacher">
+			<result property="account" column="t_account" javaType="int"/>
+			<result property="name" column="t_name" javaType="String"/>
+		</association>
+	</resultMap>
+    <select id="queryEntrepreneur" resultMap="entrepreneur">
+		SELECT account, name, password,
+		       sex, phone_number, address, resume, current_state
+		FROM entrepreneur
+	</select>
+	<select id="queryOwnEntrepreneur" resultMap="entrepreneur">
+		SELECT e.account, e.name,
+			   e.sex, e.phone_number, e.address, e.resume, current_state,
+		       t.account t_account, t.name t_name
+		FROM entrepreneur e
+		left join teacher t on e.teacher_account = t.account
+		WHERE
+			e.teacher_account=#{teacherAccount}
+	</select>
+	<select id="queryEntrepreneurByTeacher" resultMap="entrepreneur">
+		SELECT e.account, e.name,
+			   e.sex, e.phone_number, e.address, e.resume, current_state,
+			   t.account t_account, t.name t_name
+		FROM entrepreneur e
+				 left join teacher t on e.teacher_account = t.account
+		WHERE
+			e.teacher_account=#{teacherAccount} and e.current_state=#{currentState}
+	</select>
+    <select id="queryEntrepreneurByAccount" resultMap="entrepreneur">
+		SELECT e.account, e.name, e.password,
+			   e.sex, e.phone_number, e.address, e.resume, e.current_state, e.teacher_account,
+			   t.account t_account, t.name t_name
+		FROM entrepreneur e
+		left join teacher t on e.teacher_account = t.account
+		WHERE
+			e.account=#{account}
+	</select>
+    <insert id="insertEntrepreneur" useGeneratedKeys="true" keyProperty="id"
+            keyColumn="id" parameterType="com.manager.entity.Entrepreneur">
+		INSERT INTO
+			entrepreneur(account, name, password,
+						 sex, phone_number, address, resume)
+		VALUES
+		(#{account},#{name},#{password},#{sex},
+		#{phoneNumber},#{address},#{resume})
+	</insert>
+	<update id="unBindTeacher">
+		update entrepreneur
+		set
+			teacher_account=#{teacherAccount},current_state=#{currentState}
+		where account=#{account}
+	</update>
+    <update id="updateEntrepreneur" parameterType="com.manager.entity.Entrepreneur">
+		update entrepreneur
+		set
+		<trim  suffixOverrides="," >
+            <if test="password != null and password != ''">
+                password=#{password},
+            </if>
+            <if test="sex != null">
+                sex=#{sex},
+            </if>
+            <if test="phoneNumber != null">
+                phone_number=#{phoneNumber},
+            </if>
+            <if test="address != null">
+                address=#{address},
+            </if>
+            <if test="resume != null">
+                resume=#{resume},
+            </if>
+			<if test="currentState != null">
+				current_state=#{currentState},
+			</if>
+		</trim>
+        where account=#{account}
+    </update>
+    <delete id="deleteEntrepreneur">
+		DELETE FROM
+			entrepreneur
+		WHERE
+			account=#{account}
+	</delete>
+</mapper>

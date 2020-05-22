@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manager.mapper.TeacherMapper">
+    <select id="queryTeacher" resultType="com.manager.entity.Teacher">
+		SELECT account, name,
+			   password, sex, phone_number,
+			   address, resume
+		FROM teacher
+	</select>
+    <select id="queryTeacherById" resultType="com.manager.entity.Teacher">
+		SELECT account, name,
+		       password, sex, phone_number,
+		       address, resume
+		FROM teacher
+		WHERE
+			account=#{account}
+	</select>
+    <insert id="insertTeacher" useGeneratedKeys="true" keyProperty="id"
+            keyColumn="id" parameterType="com.manager.entity.Teacher">
+		INSERT INTO
+			teacher(account, name,
+					password, sex, phone_number,
+					address, resume)
+		VALUES
+		(#{account},#{name},#{password},
+		#{sex},#{phoneNumber},#{address},#{resume})
+	</insert>
+    <update id="updateTeacher" parameterType="com.manager.entity.Teacher">
+		update teacher
+		set
+		<trim  suffixOverrides="," >
+			<if test="password != null and password != ''">
+				password=#{password},
+			</if>
+			<if test="sex != null and sex != ''">
+				sex=#{sex},
+			</if>
+			<if test="phoneNumber != null and phoneNumber != ''">
+				phone_number=#{phoneNumber},
+			</if>
+			<if test="address != null and address != ''">
+				address=#{address},
+			</if>
+			<if test="resume != null and resume != ''">
+				resume=#{resume},
+			</if>
+		</trim>
+		where account=#{account}
+    </update>
+    <delete id="deleteTeacher">
+		DELETE FROM
+			teacher
+		WHERE
+		    account=#{account}
+	</delete>
+</mapper>

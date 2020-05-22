@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manager.mapper.ProjectMapper">
+	<resultMap id="project" type="Project">
+		<id property="id" column="id" javaType="int"/>
+		<result property="name" column="name" javaType="String"/>
+		<result property="content" column="content" javaType="String"/>
+		<result property="funds" column="funds" javaType="Double"/>
+		<result property="managerState" column="manager_state" javaType="int"/>
+		<result property="managerBack" column="manager_back" javaType="String"/>
+		<result property="teacherState" column="teacher_state" javaType="int"/>
+		<result property="teacherBack" column="teacher_back" javaType="String"/>
+		<result property="createTime" column="create_time" javaType="java.sql.Timestamp"/>
+		<result property="updateTime" column="update_time" javaType="java.sql.Timestamp"/>
+		<result property="entrepreneurId" column="entrepreneur_id" javaType="int"/>
+		<association property="entrepreneur" column="entrepreneur_id" javaType="Entrepreneur">
+			<result property="account" column="e_account" javaType="int"/>
+			<result property="name" column="e_name" javaType="String"/>
+		</association>
+	</resultMap>
+
+    <select id="queryProject" resultMap="project">
+		SELECT id, p.name,
+			   content, funds,
+		       manager_state, manager_back, teacher_state, teacher_back,
+			   create_time, update_time, entrepreneur_id,
+		       e.account e_account, e.name e_name
+		FROM project p
+			left join entrepreneur e on p.entrepreneur_id = e.account
+	</select>
+	<select id="queryProjectByEntrepreneur" resultMap="project">
+		SELECT id, p.name,
+			   content, funds,
+			   manager_state, manager_back, teacher_state, teacher_back,
+			   create_time, update_time, entrepreneur_id,
+			   e.account e_account, e.name e_name
+		FROM project p
+				 left join entrepreneur e on p.entrepreneur_id = e.account
+		WHERE
+			entrepreneur_id=#{entrepreneurId}
+	</select>
+	<select id="queryProjectByTeacher" resultMap="project">
+		SELECT id, p.name,
+			   content, funds,
+			   manager_state, manager_back, teacher_state, teacher_back,
+			   create_time, update_time, entrepreneur_id,
+			   e.account e_account, e.name e_name
+		FROM project p
+				 left join entrepreneur e on p.entrepreneur_id = e.account
+		WHERE
+			entrepreneur_id=#{entrepreneurId} and teacher_state=#{teacherState} and manager_state=#{managerState}
+	</select>
+	<select id="queryProjectByManager" resultMap="project">
+		SELECT id, p.name,
+			   content, funds,
+			   manager_state, manager_back, teacher_state, teacher_back,
+			   create_time, update_time, entrepreneur_id,
+			   e.account e_account, e.name e_name
+		FROM project p
+				 left join entrepreneur e on p.entrepreneur_id = e.account
+		WHERE
+			manager_state=#{managerState}
+	</select>
+    <select id="queryProjectById" resultMap="project">
+		SELECT id, p.name,
+			   content, funds,
+			   manager_state, manager_back, teacher_state, teacher_back,
+			   create_time, update_time, entrepreneur_id,
+			   e.account e_account, e.name e_name
+		FROM project p
+				left join entrepreneur e on p.entrepreneur_id = e.account
+		WHERE
+		id=#{id}
+	</select>
+    <insert id="insertProject" useGeneratedKeys="true" keyProperty="id" parameterType="com.manager.entity.Project">
+		INSERT INTO
+			project(name, content, funds,
+					create_time, entrepreneur_id)
+		VALUES
+		(#{name},#{content},#{funds},#{createTime},#{entrepreneurId})
+	</insert>
+    <update id="updateProject" parameterType="com.manager.entity.Project">
+        update project p
+          set
+		<trim  suffixOverrides="," >
+			<if test="name != null and name != ''">
+				p.name=#{name},
+			</if>
+			<if test="content != null and content != ''">
+				p.content=#{content},
+			</if>
+			<if test="funds != null">
+				p.funds=#{funds},
+			</if>
+			<if test="teacherState != null">
+				p.teacher_state=#{teacherState},
+			</if>
+			<if test="teacherBack != null">
+				p.teacher_back=#{teacherBack},
+			</if>
+			<if test="managerState != null">
+				p.manager_state=#{managerState},
+			</if>
+			<if test="managerBack != null">
+				p.manager_back=#{managerBack},
+			</if>
+			<if test="updateTime != null">
+				p.update_time=#{updateTime},
+			</if>
+		</trim>
+        where id=#{id}
+    </update>
+    <delete id="deleteProject">
+		DELETE FROM
+			project
+		WHERE
+		id =
+		#{id}
+	</delete>
+</mapper>

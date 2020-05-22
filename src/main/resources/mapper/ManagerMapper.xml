@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manager.mapper.ManagerMapper">
+    <select id="queryManagerById" resultType="com.manager.entity.Manager">
+		SELECT account, name, password,
+		sex, phone_number, address, resume
+		FROM manager
+		WHERE
+			account=#{account}
+	</select>
+    <update id="updateManager" parameterType="com.manager.entity.Manager">
+        update manager
+          set
+        <trim  suffixOverrides="," >
+            <if test="password != null and password != ''">
+                password=#{password},
+            </if>
+            <if test="sex != null and sex != ''">
+                sex=#{sex},
+            </if>
+            <if test="phoneNumber != null">
+                phone_number=#{phoneNumber},
+            </if>
+            <if test="address != null">
+                address=#{address},
+            </if>
+            <if test="resume != null">
+                resume=#{resume},
+            </if>
+        </trim>
+        where account=#{account}
+    </update>
+</mapper>
